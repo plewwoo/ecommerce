@@ -1,0 +1,26 @@
+app_id: ecommerce
+database:
+  username: root
+  password: Theplew1531.
+  database: ecommerce
+  ip: '127.0.0.1'
+  # instance: fourwd:asia-southeast1:production-01
+# jwt_secret_key: kbKszQyC0wX0cXdBzdFE8yICm0bzm770
+# jwt_refresh_secret_key: 15s6dkO7z9NFzCrX3DGNxYXt4F7SPftN
+# firebase: firebase-key.local.json
+# firebase_notification: firebase-key.local.json
+# token:
+#   upload: oQ4TjJggqT4qAhXfm2Bwz0zFtRSTPqsJ1cXjRfqsYYibl34CHwu1OLiRqVTWM9dRB9QxQufCSFSLC7lMa9kyHF6PacBRkOXpldlEHcx66ykPEzpH041Hm8WKxEs881Sq
+# sms:
+#   url_request: https://otp.thaibulksms.com/v2/otp/request
+#   url_verify: https://otp.thaibulksms.com/v2/otp/verify
+#   sms_key: 1792217461285174
+#   sms_secret: c85286d21c108c5fc374cb72ca4636ef
+# sync:
+#   url_grade_remark : https://digitalsiamcity.com/services/checklist_summary.php
+# public_path:
+#   - login
+#   - sendmessagetouser
+#   - addusertosubscription
+#   - sendmessagetosubscriber
+#   - removeuserfromsubscription
