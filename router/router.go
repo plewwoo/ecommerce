@@ -12,6 +12,7 @@ import (
 	productQuantityRoutes "ecommerce/routes/product/product-quantity"
 	productSizeRoutes "ecommerce/routes/product/product-size"
 	productSubCategoryRoutes "ecommerce/routes/product/product-sub-category"
+	productVariantRoutes "ecommerce/routes/product/product-variant"
 )
 
 func SetupRouter() *fiber.App {
@@ -33,6 +34,7 @@ func SetupRouter() *fiber.App {
 	api := app.Group("/api/v1")
 	authRoutes.Setup(api)
 	productRoutes.Setup(api)
+	productVariantRoutes.Setup(api)
 	productColorRoutes.Setup(api)
 	productSizeRoutes.Setup(api)
 	productQuantityRoutes.Setup(api)
