@@ -15,9 +15,6 @@ func AutoMigrate(DB *gorm.DB) {
 	DB.AutoMigrate(&productModel.Product{})
 	DB.AutoMigrate(&productModel.ProductVariant{})
 	DB.AutoMigrate(&productModel.ProductImage{})
-	DB.AutoMigrate(&productModel.ProductColor{})
-	DB.AutoMigrate(&productModel.ProductSize{})
-	DB.AutoMigrate(&productModel.ProductQuantity{})
 	DB.AutoMigrate(&productModel.ProductCategory{})
 	DB.AutoMigrate(&productModel.ProductSubCategory{})
 }

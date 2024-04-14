@@ -14,11 +14,13 @@ func Update(c *fiber.Ctx) error {
 	type Payload struct {
 		Description   string `json:"description"`
 		Price         int    `json:"price"`
-		CategoryID    int    `json:"cateogory_id"`
+		CategoryID    int    `json:"category_id"`
 		SubCategoryID int    `json:"sub_category_id"`
-		SizeID        int    `json:"size_id"`
-		ColorID       int    `json:"color_id"`
-		QuantityID    int    `json:"quantity_id"`
+		ColorName     string `json:"color_name"`
+		ColorCode     string `json:"color_code"`
+		SizeName      string `json:"size_name"`
+		Size          string `json:"size"`
+		Quantity      int    `json:"quantity"`
 	}
 
 	payload := new(Payload)
@@ -35,9 +37,11 @@ func Update(c *fiber.Ctx) error {
 	productVariantOrm.Price = payload.Price
 	productVariantOrm.CategoryID = payload.CategoryID
 	productVariantOrm.SubCategoryID = payload.SubCategoryID
-	productVariantOrm.SizeID = payload.SizeID
-	productVariantOrm.ColorID = payload.ColorID
-	productVariantOrm.QuantityID = payload.QuantityID
+	productVariantOrm.SizeName = payload.SizeName
+	productVariantOrm.Size = payload.Size
+	productVariantOrm.ColorName = payload.ColorName
+	productVariantOrm.ColorCode = payload.ColorCode
+	productVariantOrm.Quantity = payload.Quantity
 
 	errSave := common.Database.Model(productVariantOrm).Where("id = ?", productVariantOrm.ID).Updates(&productVariantOrm)
 
