@@ -5,16 +5,26 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+func FiberDisableXFrame(c *fiber.Ctx) error {
+	c.Set("X-Frame-Options", "DENY")
+	return c.Next()
+}
+
+func FiberNoSniff(c *fiber.Ctx) error {
+	c.Set("X-Content-Type-Options", "nosniff")
+	return c.Next()
+}
+
 func FiberReviewPayload(c *fiber.Ctx) error {
-	//return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": 0, "message": "review your payload"})
 	PrintError("FiberReviewPayload", "")
-	return FiberError(c, fiber.StatusBadRequest, "review your payload")
+	return FiberError(c, "1002", "review your payload")
 }
 
 func FiberSuccess(c *fiber.Ctx) error {
@@ -22,37 +32,24 @@ func FiberSuccess(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": 1, "message": "success"})
 }
 
-/* func FiberError(c *fiber.Ctx, errorCode ...string) error {
-	if errorCode[0] != "" {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": 0, "code": errorCode[0], "message": "error"})
-	}
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": 0, "message": "error"})
-} */
-
-func FiberCustom(c *fiber.Ctx, status int, errorMessage string) error {
+func FiberCustom(c *fiber.Ctx, status int, errorCode string, errorMessage string) error {
 	logDesc := getFiberInfo(c)
+	logDesc += fmt.Sprintf("\n Return Code: %s", errorCode)
 	logDesc += fmt.Sprintf("\n Return Message: %s", errorMessage)
 	PrintError("FiberError", logDesc)
-	return c.Status(status).JSON(fiber.Map{"status": 0, "message": errorMessage})
+	return c.Status(status).JSON(fiber.Map{"status": 0, "code": errorCode, "message": errorMessage})
 }
 
-func FiberError(c *fiber.Ctx, status int, errorMessage string) error {
-	// logDesc := getFiberInfo(c)
-	// logDesc += fmt.Sprintf("\n Return Code: %s", errorCode)
-	// logDesc += fmt.Sprintf("\n Return Message: %s", errorMessage)
-	// PrintError("FiberError", logDesc)
-	// return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": 0, "code": errorCode, "message": errorMessage})
-	return FiberCustom(c, status, errorMessage)
+func FiberError(c *fiber.Ctx, errorCode string, errorMessage string, err ...error) error {
+	log.Println("Error", err)
+	return FiberCustom(c, fiber.StatusInternalServerError, errorCode, errorMessage)
 }
 
 func FiberQueryWithCustomDB(c *fiber.Ctx, db *sql.DB, sql string, values ...interface{}) error {
-	// Print(fmt.Sprintf("Fiber Query [UserID: %s]", GetSessionUserID(c)), fmt.Sprintf("Query: %s", sql))
-	//Print("Fiber Query", fmt.Sprintf("Query: %s", sql))
-
 	jsonBytes, err := queryToJSON(db, sql, values...)
 	if err != nil {
 		PrintError(`SQL Error`, err.Error())
-		return FiberError(c, fiber.StatusInternalServerError, "sql error")
+		return FiberError(c, "1001", "sql error")
 	}
 	return FiberSendData(c, string(jsonBytes))
 }
@@ -86,8 +83,8 @@ func FiberDeleteByID(c *fiber.Ctx, tableName string) error {
 	result := Database.Exec(`UPDATE ? SET deleted_at = now(), deleted_by = ? WHERE id = ?`, tableName, payload.DeleteBy, payload.ID)
 	if result.Error != nil {
 		PrintError(`FiberDelete`, result.Error.Error())
-		return FiberError(c, fiber.StatusInternalServerError, "sql error")
-	} //fmt.Println("Affected Rows:", result.RowsAffected)
+		return FiberError(c, "1001", "sql error")
+	}
 
 	return FiberSuccess(c)
 }
@@ -111,7 +108,7 @@ func FiberDeletePermanentByID(c *fiber.Ctx, tableName string) error {
 	result := Database.Exec(`DELETE FROM ? WHERE id = ?`, tableName, payload.ID)
 	if result.Error != nil {
 		PrintError(`FiberDeletePermanent`, result.Error.Error())
-		return FiberError(c, fiber.StatusInternalServerError, "sql error")
+		return FiberError(c, "1001", "sql error")
 	}
 
 	return FiberSuccess(c)
@@ -142,13 +139,8 @@ func queryToJSON(db *sql.DB, sql string, values ...interface{}) ([]byte, error) 
 		return nil, err
 	}
 
-	// types, err := rows.ColumnTypes()
-	// if err != nil {
-	// 	return nil, err
-	// }
-
 	result := make([]map[string]interface{}, 0)
-	//result := make([]map[string]string, 0)
+
 	for rows.Next() {
 		values := make([]interface{}, len(columns))
 		valuePtrs := make([]interface{}, len(columns))
@@ -190,15 +182,6 @@ func queryToJSON(db *sql.DB, sql string, values ...interface{}) ([]byte, error) 
 
 	return json.Marshal(result)
 }
-
-/* func containsAny(target string, list []string) bool {
-	for _, str := range list {
-		if strings.Contains(target, str) {
-			return true
-		}
-	}
-	return false
-} */
 
 func getFiberInfo(c *fiber.Ctx) string {
 	logDesc := fmt.Sprintf("API Path: %s", c.Path())

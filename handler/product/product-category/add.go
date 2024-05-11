@@ -32,7 +32,7 @@ func Add(c *fiber.Ctx) error {
 
 	if errSave.Error != nil {
 		common.PrintError(" save error error ", errSave.Error.Error())
-		common.FiberError(c, fiber.StatusBadRequest, "can't save")
+		return common.FiberError(c, "400", "can't save")
 	}
 
 	return common.FiberSuccess(c)

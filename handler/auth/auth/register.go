@@ -5,7 +5,6 @@ import (
 	model "ecommerce/model/user"
 
 	"github.com/gofiber/fiber/v2"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func Register(c *fiber.Ctx) error {
@@ -23,10 +22,7 @@ func Register(c *fiber.Ctx) error {
 		return common.FiberReviewPayload(c)
 	}
 
-	bytes, err := bcrypt.GenerateFromPassword([]byte(payload.Password), 10)
-	if err != nil {
-		return err
-	}
+	hash, _ := common.HashPassword(payload.Password)
 
 	userOrm := new(model.User)
 
@@ -36,18 +32,18 @@ func Register(c *fiber.Ctx) error {
 
 	if checkUsername == "" {
 		userOrm.Username = payload.Username
-		userOrm.Password = string(bytes)
+		userOrm.Password = string(hash)
 		userOrm.Firstname = payload.Firstname
 		userOrm.Lastname = payload.Lastname
 		errSave := common.Database.Create(userOrm)
 
 		if errSave.Error != nil {
 			common.PrintError(" save error error ", errSave.Error.Error())
-			common.FiberError(c, fiber.StatusBadRequest, "can't save")
+			common.FiberError(c, "400", "can't save")
 		}
 
 		return common.FiberSuccess(c)
 	} else {
-		return common.FiberError(c, fiber.StatusBadRequest, "Username already exists")
+		return common.FiberError(c, "400", "Username already exists")
 	}
 }

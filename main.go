@@ -17,7 +17,7 @@ func main() {
 
 	routes := router.SetupRouter()
 
-	if err := routes.Listen(":8000"); err != nil {
+	if err := routes.Listen(":8080"); err != nil {
 		log.Fatal(err)
 	}
 }

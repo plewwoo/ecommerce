@@ -53,7 +53,7 @@ func Add(c *fiber.Ctx) error {
 
 	if errSaveProduct := common.Database.Save(productOrm).Error; errSaveProduct != nil {
 		common.PrintError(" save product error ", errSaveProduct.Error())
-		common.FiberError(c, fiber.StatusBadRequest, "can't save product")
+		common.FiberError(c, "400", "can't save product")
 		return errSaveProduct
 	}
 
@@ -72,7 +72,7 @@ func Add(c *fiber.Ctx) error {
 
 		if errSaveProductVariant := common.Database.Save(productVariantOrm).Error; errSaveProductVariant != nil {
 			common.PrintError(" save product variant error ", errSaveProductVariant.Error())
-			common.FiberError(c, fiber.StatusBadRequest, "can't save product variant")
+			common.FiberError(c, "400", "can't save product variant")
 			return errSaveProductVariant
 		}
 
@@ -84,7 +84,7 @@ func Add(c *fiber.Ctx) error {
 
 			if errSaveProductImg := common.Database.Save(productImgOrm).Error; errSaveProductImg != nil {
 				common.PrintError(" save product img error ", errSaveProductImg.Error())
-				common.FiberError(c, fiber.StatusBadRequest, "can't save product img")
+				common.FiberError(c, "400", "can't save product img")
 				return errSaveProductImg
 			}
 		}

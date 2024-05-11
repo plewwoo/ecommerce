@@ -7,6 +7,9 @@ import (
 )
 
 func Setup(router fiber.Router) {
-	newRouter := router.Group("/auth")
-	newRouter.Post("/register", handler.Register)
+	registerRoute := router.Group("/register")
+	registerRoute.Post("/", handler.Register)
+
+	loginRoute := router.Group("/login")
+	loginRoute.Post("/", handler.Login)
 }
